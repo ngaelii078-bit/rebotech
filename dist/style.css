@@ -28,3 +28,8 @@
 .industries{background:#d5d7ce}.industry-grid{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #aeb1a6;border-bottom:1px solid #aeb1a6}.industry-grid article{padding:30px 32px 35px 0}.industry-grid article+article{border-left:1px solid #aeb1a6;padding-left:32px}.industry-grid article>span{font-size:9px;letter-spacing:1.4px;font-weight:700;color:#85897d}.industry-grid h3{font-size:37px;margin:40px 0 22px}.industry-grid p{font-size:13px;line-height:1.75;color:#676b61;max-width:290px}
 @media(max-width:800px){.video-note{right:6%;bottom:65px;font-size:7px}.workshop-detail{grid-template-columns:1fr;gap:45px}.workshop-detail .section-label{margin-bottom:50px}.workshop-detail h2{font-size:clamp(60px,14vw,90px)}.workshop-detail-photo{min-height:420px}.industry-grid{grid-template-columns:1fr}.industry-grid article,.industry-grid article+article{padding:25px 0;border-left:0}.industry-grid article+article{border-top:1px solid #aeb1a6}.industry-grid h3{font-size:31px;margin:25px 0 15px}}
 @media(prefers-reduced-motion:reduce){.hero-video{display:none}}
+
+/* Keep navigation visible without covering sections reached from its links. */
+.header{position:sticky;top:0;z-index:20}
+main section[id]{scroll-margin-top:100px}
+@media(max-width:800px){.mobile-nav{position:fixed;top:76px;z-index:21}main section[id]{scroll-margin-top:86px}}
