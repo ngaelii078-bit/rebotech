@@ -1,0 +1,16 @@
+const menuButton = document.querySelector('.menu-toggle');
+const mobileNav = document.querySelector('.mobile-nav');
+menuButton.addEventListener('click', () => { const open = mobileNav.classList.toggle('open'); menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); });
+mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { mobileNav.classList.remove('open'); menuButton.setAttribute('aria-expanded', 'false'); menuButton.setAttribute('aria-label', 'Open menu'); }));
+document.getElementById('year').textContent = new Date().getFullYear();
+const chat = document.querySelector('.chat');
+const chatToggle = document.querySelector('.assistant-toggle');
+const chatBody = document.querySelector('.chat-body');
+const chatInput = document.getElementById('chat-input');
+function setChat(open) { chat.hidden = !open; chatToggle.setAttribute('aria-expanded', String(open)); if (open) chatInput.focus(); }
+chatToggle.addEventListener('click', () => setChat(chat.hidden));
+document.querySelector('.chat-close').addEventListener('click', () => { setChat(false); chatToggle.focus(); });
+function answer(question) { const q = question.toLowerCase(); if (/where|address|location|based|find|visit/.test(q)) return 'Our workshop is at 16 Grader Road, Spartan Ext 3, Kempton Park, Gauteng, 1619.'; if (/contact|phone|call|number|email|quote|price|cost/.test(q)) return 'Call our team on +27 (0)11 392 1011 or +27 (0)11 392 6490 to discuss your requirements.'; if (/pipe|fitting|bend/.test(q)) return 'We fabricate industrial pipework and fittings, including flanges, reducers, T- and Y-pieces and lobster-back bends.'; if (/drive|rebuild|repair/.test(q)) return 'We inspect, repair and rebuild driveline and final-drive components. Give us a call to discuss the details of your job.'; if (/fabricat|steel|tank|chute|hopper|conveyor/.test(q)) return 'Our general and heavy fabrication includes carbon and stainless steel platework, tanks, chutes, hoppers, gantries and conveyor modules.'; if (/service|offer|what|engineering|work|do you/.test(q)) return 'We offer driveline and final-drive rebuilding, metallurgical and mechanical engineering consulting, general and heavy fabrication, and industrial pipework.'; return 'For help with that, please call our team on +27 (0)11 392 1011. You can also ask me about our services or workshop location.'; }
+function sendQuestion(value) { const question = value.trim(); if (!question) return; const quick = chatBody.querySelector('.quick-questions'); if (quick) quick.remove(); const user = document.createElement('div'); user.className = 'user-message'; user.textContent = question; chatBody.appendChild(user); const response = document.createElement('div'); response.className = 'bot-message'; response.textContent = answer(question); chatBody.appendChild(response); chatBody.scrollTop = chatBody.scrollHeight; chatInput.value = ''; }
+document.querySelector('.chat-form').addEventListener('submit', event => { event.preventDefault(); sendQuestion(chatInput.value); });
+document.querySelectorAll('.quick-questions button').forEach(button => button.addEventListener('click', () => sendQuestion(button.textContent)));
