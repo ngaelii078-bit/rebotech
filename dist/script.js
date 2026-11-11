@@ -1,7 +1,10 @@
 const menuButton = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
-menuButton.addEventListener('click', () => { const open = mobileNav.classList.toggle('open'); menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); });
-mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { mobileNav.classList.remove('open'); menuButton.setAttribute('aria-expanded', 'false'); menuButton.setAttribute('aria-label', 'Open menu'); }));
+function setMenu(open) { mobileNav.classList.toggle('open', open); menuButton.setAttribute('aria-expanded', String(open)); menuButton.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); }
+menuButton.addEventListener('click', () => setMenu(!mobileNav.classList.contains('open')));
+mobileNav.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && mobileNav.classList.contains('open')) { setMenu(false); menuButton.focus(); } });
+document.addEventListener('click', event => { if (mobileNav.classList.contains('open') && !mobileNav.contains(event.target) && !menuButton.contains(event.target)) setMenu(false); });
 document.getElementById('year').textContent = new Date().getFullYear();
 const chat = document.querySelector('.chat');
 const chatToggle = document.querySelector('.assistant-toggle');
