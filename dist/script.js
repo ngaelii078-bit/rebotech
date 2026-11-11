@@ -14,3 +14,105 @@ function answer(question) { const q = question.toLowerCase(); if (/where|address
 function sendQuestion(value) { const question = value.trim(); if (!question) return; const quick = chatBody.querySelector('.quick-questions'); if (quick) quick.remove(); const user = document.createElement('div'); user.className = 'user-message'; user.textContent = question; chatBody.appendChild(user); const response = document.createElement('div'); response.className = 'bot-message'; response.textContent = answer(question); chatBody.appendChild(response); chatBody.scrollTop = chatBody.scrollHeight; chatInput.value = ''; }
 document.querySelector('.chat-form').addEventListener('submit', event => { event.preventDefault(); sendQuestion(chatInput.value); });
 document.querySelectorAll('.quick-questions button').forEach(button => button.addEventListener('click', () => sendQuestion(button.textContent)));
+
+// A word-by-word scroll reveal that keeps the existing heading markup and colours.
+(() => {
+  const root = document.documentElement;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const headings = document.querySelectorAll('.hero h1, main h2');
+  const reveals = document.querySelectorAll('.intro-bottom, .section-head > p, .service-row, .feature-copy > p:not(.overline), .capabilities, .statement p, .contact-main > p:not(.overline), .contact-details');
+  const photo = document.querySelector('.feature-image');
+  const hero = document.querySelector('.hero');
+  const progress = document.createElement('div');
+  progress.className = 'scroll-progress';
+  progress.setAttribute('aria-hidden', 'true');
+  document.body.prepend(progress);
+
+  function prepareHeading(heading) {
+    const label = heading.innerText.replace(/\s+/g, ' ').trim();
+    const walker = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    let index = 0;
+    nodes.forEach(node => {
+      const fragment = document.createDocumentFragment();
+      (node.nodeValue.match(/\s+|\S+/g) || []).forEach(part => {
+        if (/^\s+$/.test(part)) { fragment.appendChild(document.createTextNode(part)); return; }
+        const mask = document.createElement('span');
+        const word = document.createElement('span');
+        mask.className = 'motion-mask';
+        mask.setAttribute('aria-hidden', 'true');
+        word.className = 'motion-word';
+        word.textContent = part;
+        word.style.setProperty('--word-delay', `${Math.min(index++ * 50, 500)}ms`);
+        mask.appendChild(word);
+        fragment.appendChild(mask);
+      });
+      node.replaceWith(fragment);
+    });
+    heading.setAttribute('aria-label', label);
+    heading.classList.add('word-heading');
+  }
+
+  if ('IntersectionObserver' in window) {
+    headings.forEach(prepareHeading);
+    reveals.forEach((element, index) => {
+      element.classList.add('scroll-reveal');
+      if (element.classList.contains('service-row')) element.style.setProperty('--reveal-delay', `${(index % 4) * 70}ms`);
+    });
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('motion-visible'); observer.unobserve(entry.target); }
+    }), { threshold: .1, rootMargin: '0px 0px -30px 0px' });
+    [...headings, ...reveals, photo].forEach(element => observer.observe(element));
+    if (!reduce.matches) root.classList.add('motion-enabled');
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('hero-ready')));
+  }
+
+  let frame = 0;
+  function paint() {
+    frame = 0;
+    const maxScroll = Math.max(1, root.scrollHeight - innerHeight);
+    root.style.setProperty('--reading-progress', Math.min(1, Math.max(0, scrollY / maxScroll)));
+    if (reduce.matches) return;
+    const heroDistance = Math.min(scrollY, hero.offsetHeight);
+    hero.style.setProperty('--hero-shift', `${heroDistance * (innerWidth < 768 ? .1 : .2)}px`);
+    const rect = photo.getBoundingClientRect();
+    if (rect.bottom > 0 && rect.top < innerHeight) {
+      const position = Math.max(-1, Math.min(1, (innerHeight / 2 - (rect.top + rect.height / 2)) / innerHeight));
+      photo.style.setProperty('--feature-shift', `${position * 20}px`);
+    }
+  }
+  function requestPaint() { if (!frame) frame = requestAnimationFrame(paint); }
+  window.addEventListener('scroll', requestPaint, { passive: true });
+  window.addEventListener('resize', requestPaint, { passive: true });
+  reduce.addEventListener('change', event => {
+    root.classList.toggle('motion-enabled', !event.matches && 'IntersectionObserver' in window);
+    requestPaint();
+  });
+  requestPaint();
+})();
+
+
+// Smooth desktop wheel movement while keeping touch and nested chat scrolling native.
+(() => {
+  const desktop = matchMedia('(min-width: 768px) and (pointer: fine)');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let target = 0;
+  let wheelFrame = 0;
+  function step() {
+    const delta = target - window.scrollY;
+    if (Math.abs(delta) < .5) { window.scrollTo({ top: target, behavior: 'instant' }); wheelFrame = 0; return; }
+    window.scrollTo({ top: window.scrollY + delta * .14, behavior: 'instant' });
+    wheelFrame = requestAnimationFrame(step);
+  }
+  window.addEventListener('wheel', event => {
+    if (!desktop.matches || reduced.matches || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey || event.target.closest('.chat')) return;
+    if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+    event.preventDefault();
+    const scale = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1;
+    if (!wheelFrame) target = scrollY;
+    target = Math.max(0, Math.min(document.documentElement.scrollHeight - innerHeight, target + event.deltaY * scale));
+    if (!wheelFrame) wheelFrame = requestAnimationFrame(step);
+  }, { passive: false });
+  window.addEventListener('keydown', () => { if (wheelFrame) cancelAnimationFrame(wheelFrame); wheelFrame = 0; }, { passive: true });
+})();
