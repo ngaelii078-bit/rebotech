@@ -93,3 +93,116 @@ main section[id]{scroll-margin-top:100px}
 @media (max-width: 600px) {
   .hero-bottom .scroll-cue { display: none; }
 }
+
+/* Light blue and white site palette. */
+:root {
+  --ink: #173b5c;
+  --paper: #fff;
+  --yellow: #398bc9;
+  --muted: #58738c;
+}
+
+.header,
+footer,
+.assistant-toggle,
+.chat-head,
+.mobile-nav {
+  background: #286c9f;
+}
+
+.hero {
+  background: #286c9f;
+}
+
+.feature {
+  background: #eaf5fe;
+  color: #173b5c;
+}
+
+.hero-shade {
+  background: linear-gradient(90deg, rgba(8, 30, 58, .87) 0%, rgba(8, 30, 58, .56) 47%, rgba(8, 30, 58, .12) 100%), linear-gradient(0deg, rgba(8, 30, 58, .65), transparent 22%);
+}
+
+.btn-yellow,
+.chat-form button {
+  background: #398bc9;
+}
+
+.ticker,
+.statement {
+  background: #dcedfb;
+  color: #173b5c;
+}
+
+.btn-yellow {
+  color: #fff;
+}
+
+.intro,
+.contact,
+.workshop-detail,
+.chat,
+.bot-message {
+  background: #fff;
+}
+
+.services {
+  background: #f1f8fe;
+}
+
+.industries,
+.user-message {
+  background: #e5f2fc;
+}
+
+.intro h2 span,
+.section-head h2 span,
+.contact h2 span,
+.workshop-detail h2 > span {
+  color: #398bc9;
+}
+
+.feature h2 span,
+.statement h2 span {
+  color: #398bc9;
+}
+
+.feature-copy .section-label,
+.feature-copy > p:not(.overline) {
+  color: #526b84;
+}
+
+.intro-bottom p,
+.contact-main > p:not(.overline),
+.workshop-detail-copy > p,
+.service-row p,
+.section-head > p,
+.industry-grid p,
+.detail-list p {
+  color: #526b84;
+}
+
+.label-line,
+.service-arrow {
+  background-color: #b7d5ef;
+}
+
+.service-arrow,
+.feature .arrow-link {
+  border-color: #8db9e8;
+}
+
+.btn-dark {
+  background: #286c9f;
+  color: #fff;
+}
+
+.workshop-detail-photo {
+  background: #286c9f;
+}
+
+@media (max-width: 600px) {
+  .hero-shade {
+    background: linear-gradient(90deg, #081e3ae8 0%, #081e3a9c 70%, #081e3a5c), linear-gradient(0deg, #081e3ac9, transparent 35%);
+  }
+}
