@@ -22,11 +22,6 @@ document.querySelectorAll('.quick-questions button').forEach(button => button.ad
   const headings = document.querySelectorAll('.hero h1, main h2');
   const reveals = document.querySelectorAll('.intro-bottom, .section-head > p, .service-row, .feature-copy > p:not(.overline), .capabilities, .statement p, .contact-main > p:not(.overline), .contact-details');
   const photo = document.querySelector('.feature-image');
-  const hero = document.querySelector('.hero');
-  const progress = document.createElement('div');
-  progress.className = 'scroll-progress';
-  progress.setAttribute('aria-hidden', 'true');
-  document.body.prepend(progress);
 
   function prepareHeading(heading) {
     const label = heading.innerText.replace(/\s+/g, ' ').trim();
@@ -71,11 +66,7 @@ document.querySelectorAll('.quick-questions button').forEach(button => button.ad
   let frame = 0;
   function paint() {
     frame = 0;
-    const maxScroll = Math.max(1, root.scrollHeight - innerHeight);
-    root.style.setProperty('--reading-progress', Math.min(1, Math.max(0, scrollY / maxScroll)));
     if (reduce.matches) return;
-    const heroDistance = Math.min(scrollY, hero.offsetHeight);
-    hero.style.setProperty('--hero-shift', `${heroDistance * (innerWidth < 768 ? .1 : .2)}px`);
     const rect = photo.getBoundingClientRect();
     if (rect.bottom > 0 && rect.top < innerHeight) {
       const position = Math.max(-1, Math.min(1, (innerHeight / 2 - (rect.top + rect.height / 2)) / innerHeight));
@@ -115,4 +106,22 @@ document.querySelectorAll('.quick-questions button').forEach(button => button.ad
     if (!wheelFrame) wheelFrame = requestAnimationFrame(step);
   }, { passive: false });
   window.addEventListener('keydown', () => { if (wheelFrame) cancelAnimationFrame(wheelFrame); wheelFrame = 0; }, { passive: true });
+})();
+
+
+// Respect reduced-motion preferences and pause the decorative video off screen.
+(() => {
+  const video = document.querySelector('.hero-video');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  let onScreen = true;
+  function syncVideo() {
+    if (reduced.matches || !onScreen || document.hidden) video.pause();
+    else video.play().catch(() => {});
+  }
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => { onScreen = entries[0].isIntersecting; syncVideo(); }).observe(video);
+  }
+  reduced.addEventListener('change', syncVideo);
+  document.addEventListener('visibilitychange', syncVideo);
+  syncVideo();
 })();
